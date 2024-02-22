@@ -21,16 +21,35 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public List<Product> GetProducts()
+    public IActionResult GetProducts()
     {
-        return _products ?? new List<Product>();
+        if(_products ==  null)
+        {
+            return NotFound();
+        }
+
+        return Ok(_products);
     }
+
+
 
     //[HttpGet("api/{controller}/{id}")]
     [HttpGet("{id}")]
-    public Product GetProduct( int id )
+    public IActionResult GetProduct( int? id )
     {
-        return _products?.FirstOrDefault( i => i.ProductId == id) ?? new Product();
+        if(id == null)
+        {
+            return NotFound();
+        }
+
+        var p = _products?.FirstOrDefault(i => i.ProductId == id);
+
+        if(p == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(p);
     }
 
 }
