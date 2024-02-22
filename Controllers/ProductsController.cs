@@ -15,6 +15,8 @@ public class ProductsController : ControllerBase
         _context = context;
     }
 
+    
+
     [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
@@ -50,7 +52,41 @@ public class ProductsController : ControllerBase
         _context.Products.Add(entity);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetProduct), new{id = entity.ProductId}, entity);
+        return CreatedAtAction(nameof(GetProduct), new{id = entity.ProductId}, entity); //201
+    }
+
+
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateProduct(int id, Product entity)
+    {
+        if(id != entity.ProductId)
+        {
+            return BadRequest();
+        }
+
+        var product = await _context.Products.FirstOrDefaultAsync(i => i.ProductId == id);
+
+        if(product == null)
+        {
+            return NotFound();
+        }
+
+        product.ProductName = entity.ProductName;
+        product.Price = entity.Price;
+        product.IsActive = entity.IsActive;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (System.Exception)
+        {
+            
+            return NotFound();
+        }
+
+        return NoContent();
     }
 
 }
