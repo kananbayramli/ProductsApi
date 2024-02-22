@@ -15,7 +15,7 @@ public class ProductsController : ControllerBase
         _context = context;
     }
 
-    
+
 
     [HttpGet]
     public async Task<IActionResult> GetProducts()
@@ -83,6 +83,39 @@ public class ProductsController : ControllerBase
         catch (System.Exception)
         {
             
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+
+
+
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(int? id)
+    {
+        if(id == null)
+        {
+            return NotFound();
+        }
+
+        var product = await _context.Products.FirstOrDefaultAsync(i => i.ProductId == id);
+
+        if(product ==  null)
+        {
+            return NotFound();
+        }
+
+        _context.Products.Remove(product);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (System.Exception)
+        {     
             return NotFound();
         }
 
