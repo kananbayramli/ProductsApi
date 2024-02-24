@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductsAPI.DTO;
@@ -35,6 +36,7 @@ public class ProductsController : ControllerBase
 
     //[HttpGet("api/{controller}/{id}")]
     [HttpGet("{id}")]
+    [Authorize]
     public async  Task<IActionResult> GetProduct( int? id )
     {
         if(id == null)
@@ -42,7 +44,7 @@ public class ProductsController : ControllerBase
             return NotFound();
         }
 
-        var p = await _context.Products.Select( p => ProductToDTO(p)).FirstOrDefaultAsync(x => x.ProductId == id);
+        var p = await _context.Products.Where(x => x.ProductId == id).Select( p => ProductToDTO(p)).FirstOrDefaultAsync();
 
         if(p == null)
         {
@@ -132,11 +134,16 @@ public class ProductsController : ControllerBase
 
     private static ProductDTO ProductToDTO(Product p)
     {
-        return new ProductDTO{
-            Price = p.Price,
-            ProductName = p.ProductName,
-            ProductId = p.ProductId
-        };
+        var entity = new ProductDTO();
+
+        if(p != null)
+        {
+            entity.ProductId = p.ProductId;
+            entity.ProductName = p.ProductName;
+            entity.Price = p.Price;
+        }
+
+        return entity;
     }
 
 }
